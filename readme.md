@@ -1,4 +1,4 @@
-# OLO Pass — User Manual
+# OLO Pass — Readme
 
 Welcome to your **OLO Pass**! This hardware password vault and automated keyboard companion helps you store credentials securely and type them instantly over Bluetooth without installing any software on your computer.
 
@@ -46,6 +46,7 @@ Scroll down to **Device Settings** and **Long Press** to access hardware configu
 *   **LED Settings**: Toggle the colorful status NeoPixel light `ON` or `OFF`.
 *   **Sound Settings**: Toggle audio beeps and feedback sounds `ON` or `OFF`.
 *   **Bluetooth**: Toggle the Bluetooth antenna `ON` (ready to connect) or `OFF` (silent mode).
+    *   *Auto-Disable Feature*: If Bluetooth is enabled but remains disconnected (no host device connects) and the device is idle for **2 minutes**, Bluetooth will automatically toggle `OFF` and save to NVS to save power and improve security. A dual falling-tone beep will sound to notify you.
 *   **Time Format**: Toggle between `12-Hour` (AM/PM) and `24-Hour` clock display modes.
 *   **Hourly Chime**: Toggle a gentle audio alert on the hour `ON` or `OFF`.
 *   **Target OS**: Tell OLO Pass what operating system you are connected to (`Windows`, `macOS`, `Linux`, or `Android`) so that keyboard shortcut keystrokes map correctly.
@@ -101,4 +102,4 @@ To maintain maximum safety for your sensitive accounts, always follow these rule
 *   [ ] **Double-Check Recipient Domains**: Before using the physical OLO Pass to type credentials into a website, check the URL in your address bar to make sure it is not a phishing duplicate.
 *   [ ] **Keep Backups**: Regularly export an encrypted CSV backup of your passwords. Keep the backup sheet offline (e.g., on a secure USB drive in a safe).
 *   [ ] **Disconnect USB when Unused**: Unplug your OLO Pass from the USB port when you are not actively managing credentials via the Web Controller to block physical access.
-*   [ ] **Keep Bluetooth Off when Unnecessary**: If you only use OLO Pass in a fixed desk setup or do not need wireless connections, toggle Bluetooth `OFF` in the device settings to minimize exposure.
+*   [ ] **Keep Bluetooth Off when Unnecessary**: If you only use OLO Pass in a fixed desk setup or do not need wireless connections, toggle Bluetooth `OFF` in the device settings. Note that OLO Pass automatically turns off Bluetooth if left disconnected and idle for **2 minutes**.
