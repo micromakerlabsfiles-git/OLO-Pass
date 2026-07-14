@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>OLO Pass — OLOverse Secure Vault</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Roboto+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+  <style>
+    html {
+      scrollbar-gutter: stable;
+    }
+
+    /* ── Dark Theme (default) ─────────────────────────────────────── */
+    :root {
+      --bg: #060608;
+      --panel: rgba(18, 18, 24, 0.85);
+      --border: rgba(255, 106, 0, 0.18);
+      --primary: #ff6a00;
+      --primary-hover: #e05d00;
+      --accent: #ff9d00;
+      --text: #fdfdfd;
+      --text2: #a0a2ad;
+      --success: #10b981;
+      --danger: #ef4444;
+      --active-tab: #2d1808;
+      --header-bg: rgba(6, 6, 8, 0.85);
+      --input-bg: #111115;
+      --card-hover: rgba(255,106,0,0.03);
+      --code-bg: rgba(255,255,255,0.04);
+    }
+
+    /* ── Light Theme ─────────────────────────────────────────────── */
+    [data-theme="light"] {
+      --bg: #f4f4f6;
+      --panel: rgba(255, 255, 255, 0.92);
+      --border: rgba(255, 106, 0, 0.22);
+      --primary: #d95e00;
+      --primary-hover: #bf5200;
+      --accent: #e08000;
+      --text: #1a1a1e;
+      --text2: #5a5c6b;
+      --success: #0a8a5a;
+      --danger: #c0392b;
+      --active-tab: #fde8d8;
+      --header-bg: rgba(255, 255, 255, 0.92);
+      --input-bg: #ffffff;
+      --card-hover: rgba(255,106,0,0.04);
+      --code-bg: rgba(0,0,0,0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(255, 106, 0, 0.08) 0, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(255, 157, 0, 0.08) 0, transparent 50%);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      backdrop-filter: blur(12px);
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background 0.3s;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    header h1 span {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .conn-status-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .conn-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text2);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.5rem 0.875rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 10px var(--danger);
+      transition: all 0.3s ease;
+    }
+
+    .status-dot.connected {
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--panel);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      margin-bottom: 2rem;
+    }
+
+    .connect-panel {
+      text-align: center;
+      max-width: 600px;
+      margin: 6rem auto;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .connect-logo {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 20px rgba(255, 106, 0, 0.3));
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      padding: 0.75rem 1.75rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 106, 0, 0.45);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+      border-color: var(--primary);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover {
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 400;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    /* ── Theme toggle button ─────────────────────────────────────── */
+    .theme-toggle {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.4rem 0.85rem;
+      transition: all 0.25s;
+      line-height: 1;
+    }
+    .theme-toggle:hover {
+      background: rgba(255,106,0,0.12);
+      border-color: var(--primary);
+    }
+
+    /* ── Quick-Start guide styles ────────────────────────────────── */
+    .qs-section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 1.25rem;
+    }
+    .qs-section h3 {
+      color: var(--primary);
+      font-size: 1.05rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .qs-section ol, .qs-section ul {
+      color: var(--text2);
+      padding-left: 1.25rem;
+      line-height: 1.8;
+      font-size: 0.92rem;
+    }
+    .qs-section strong { color: var(--text); }
+    .qs-tip {
+      background: rgba(255,106,0,0.07);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 8px 8px 0;
+      padding: 0.6rem 1rem;
+      color: var(--text2);
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+    }
+    .qs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+      background: rgba(255, 106, 0, 0.04);
+    }
+
+    .tab-btn.active {
+      color: white;
+      background: var(--active-tab);
+      border: 1px solid var(--border);
+    }
+
+    .panel {
+      display: none;
+      min-height: 600px;
+    }
+
+    .panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    /* Vault Manager Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 365px;
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .vault-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      padding: 0.75rem 1rem;
+      width: 300px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(255, 106, 0, 0.2);
+    }
+
+    .vault-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .vault-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .vault-item:hover {
+      background: rgba(255, 106, 0, 0.03);
+      border-color: rgba(255, 106, 0, 0.3);
+    }
+
+    .vault-info h3 {
+      font-size: 0.925rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    .vault-info p {
+      font-size: 0.75rem;
+      color: var(--text2);
+    }
+
+    .vault-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .fav-star {
+      cursor: pointer;
+      font-size: 1.05rem;
+      color: var(--text2);
+      transition: color 0.2s;
+    }
+
+    .fav-star.active {
+      color: #ffaa00;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text2);
+    }
+
+    .form-group input,
+    .form-group select {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      padding: 0.75rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group select {
+      cursor: pointer;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff6a00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1.25rem;
+      padding-right: 2.5rem;
+    }
+
+    .form-group select option {
+      background-color: var(--input-bg);
+      color: var(--text);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 8px rgba(255, 106, 0, 0.25);
+    }
+
+    .form-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      cursor: pointer;
+    }
+
+    .form-checkbox input {
+      width: auto;
+      cursor: pointer;
+    }
+
+    .form-checkbox label {
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    /* CSV Importer zone */
+    .import-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(255, 106, 0, 0.01);
+    }
+
+    .import-zone:hover {
+      border-color: var(--primary);
+      background: rgba(255, 106, 0, 0.04);
+    }
+
+    .import-zone h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .import-zone p {
+      color: var(--text2);
+      font-size: 0.875rem;
+    }
+
+    /* Touchpad Layout */
+    .touchpad-container {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .touchpad-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .trackpad-zone {
+      background: #0b0c10;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      aspect-ratio: 16/9;
+      position: relative;
+      cursor: crosshair;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .trackpad-label {
+      color: rgba(255, 106, 0, 0.15);
+      font-size: 1.5rem;
+      font-weight: 600;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .touchpad-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .touchpad-btn {
+      background: var(--active-tab);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .touchpad-btn:hover {
+      background: rgba(255, 106, 0, 0.08);
+      border-color: var(--primary);
+    }
+
+    .touchpad-btn:active {
+      transform: scale(0.98);
+    }
+
+    .keyboard-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .keyboard-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.35rem;
+    }
+
+    .key-cap {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0;
+      text-align: center;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.1s;
+    }
+
+    .key-cap:hover {
+      background: rgba(255, 106, 0, 0.08);
+      border-color: var(--primary);
+    }
+
+    .key-cap:active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .key-cap-wide {
+      grid-column: span 2;
+    }
+
+    .key-cap-space {
+      grid-column: span 6;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text2);
+      backdrop-filter: blur(12px);
+      background: var(--header-bg);
+      margin-top: auto;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    /* ---- Password Gate Modal ---- */
+    .pw-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 6, 8, 0.92);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .pw-modal {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 106, 0, 0.1);
+    }
+
+    .pw-modal h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pw-modal p {
+      color: var(--text2);
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pw-modal input {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      width: 100%;
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.15em;
+      transition: border-color 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    .pw-modal input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px rgba(255, 106, 0, 0.25);
+    }
+
+    .pw-error {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+
+    /* ---- OLOverse Landing Page ---- */
+    .oloverse-hero {
+      text-align: center;
+      padding: 3rem 1rem 1.5rem;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .oloverse-hero .hero-badge {
+      display: inline-block;
+      background: rgba(255, 106, 0, 0.12);
+      border: 1px solid rgba(255, 106, 0, 0.3);
+      border-radius: 20px;
+      padding: 0.35rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      margin-bottom: 1.25rem;
+    }
+
+    .oloverse-hero h2 {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .oloverse-hero h2 span {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .oloverse-hero p {
+      color: var(--text2);
+      font-size: 1rem;
+      max-width: 520px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .feature-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      text-align: left;
+      transition: all 0.25s;
+    }
+
+    .feature-card:hover {
+      background: rgba(255, 106, 0, 0.04);
+      border-color: rgba(255, 106, 0, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .feature-card .icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .feature-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .feature-card p {
+      font-size: 0.8rem;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    .connect-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .oloverse-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+  </style>
+
+  <!-- Toast notification container -->
+  <div id="toastContainer"
+    style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;"></div>
+</head>
+
+<body>
+
+  <!-- Password Gate Modal (shown after USB connect, before dashboard) -->
+  <div id="pwGateModal" class="pw-modal-overlay" style="display:none;">
+    <div class="pw-modal">
+      <div style="font-size:2.5rem; margin-bottom:1rem;">🛡️</div>
+      <h2>Web Controller Access</h2>
+      <p>Enter the 4-digit OTP shown on your OLO Pass screen to access the dashboard.</p>
+      <input type="text" id="pwGateInput" placeholder="••••" maxlength="4"
+        style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-family: 'Roboto Mono', monospace; margin-bottom: 0.5rem;"
+        autocomplete="off" />
+      <div id="pwGateError" class="pw-error">Incorrect OTP. Try again.</div>
+      <button id="pwGateSubmit" class="btn" style="width:100%;">Unlock Dashboard</button>
+      <button onclick="disconnectAndClose()" class="btn btn-secondary"
+        style="width:100%; margin-top:0.5rem; box-shadow:none;">Cancel / Disconnect</button>
+    </div>
+  </div>
+
+  <!-- OTP Verification Modal (shown during PIN change) -->
+  <div id="otpModal" class="pw-modal-overlay" style="display:none;">
+    <div class="pw-modal" style="max-width: 400px;">
+      <div style="font-size:2.5rem; margin-bottom:1rem;">🛡️</div>
+      <h2 style="color: var(--primary);">Security Verification</h2>
+      <p style="margin-top: 0.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; line-height: 1.4; color: var(--text2);">
+        A One-Time Password (OTP) has been generated on your OLO-Pass device screen. Please enter it below to authorize
+        the PIN change.
+      </p>
+      <div class="form-group">
+        <input type="text" id="otpInput" maxlength="4" placeholder="••••"
+          style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-family: 'Roboto Mono', monospace; margin-bottom: 0.5rem;" />
+        <div id="otpError" class="pw-error" style="display: none; margin-bottom: 1rem; color: var(--danger);">Invalid
+          OTP. Please try again.</div>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+        <button id="btnVerifyOtp" class="btn" style="flex: 1;">Verify & Update</button>
+        <button id="btnCancelOtp" class="btn btn-secondary" style="flex: 1; box-shadow: none;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header status bar -->
+  <header>
+    <h1>OLO <span>Pass</span></h1>
+    <div class="conn-status-wrapper">
+      <div class="conn-status">
+        <div id="connDot" class="status-dot"></div>
+        <span id="connLabel">Disconnected</span>
+      </div>
+      <button id="themeToggle" class="theme-toggle" title="Toggle light / dark theme">🌙</button>
+      <button id="btnDisconnect" class="btn btn-secondary"
+        style="display: none; padding: 0.4rem 0.8rem; font-size: 0.85rem; box-shadow: none;">Disconnect</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Connect Panel with OLOverse Elements -->
+    <div id="connectPanel" class="card connect-panel" style="max-width:860px; margin: 3rem auto;">
+      <div class="oloverse-hero">
+        <div class="hero-badge">🌐 Part of OLOverse Ecosystem</div>
+        <h2>Welcome to <span>OLO Pass</span></h2>
+        <p>A secure, air-gapped BLE password vault and keyboard emulator for your ESP32. Connect via USB Serial to
+          manage passwords, configure settings, and control your device.</p>
+      </div>
+
+      <div class="connect-actions"
+        style="margin: 1.5rem 0 2.5rem 0; justify-content: center; display: flex; gap: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 2.5rem;">
+        <button id="btnConnectUsb" class="btn" style="padding: 0.85rem 2rem; font-size:1rem;">⚡ Connect via USB
+          Serial</button>
+        <button onclick="switchTab('flasher')" class="btn btn-secondary"
+          style="padding: 0.85rem 2rem; font-size:1rem;">🔧 Firmware Flasher</button>
+      </div>
+
+      <!-- Quick Start Guide directly on the Home Page -->
+      <div style="text-align: left; margin-top: 2rem; padding-top: 1rem;">
+        <h3 style="color: var(--primary); font-size: 1.25rem; font-weight: 800; margin-bottom: 1.5rem; text-align: center;">📖 Quick Start Guide</h3>
+        
+        <div class="qs-grid">
+          <div class="qs-section">
+            <h3>🤔 What is OLO Pass?</h3>
+            <ul>
+              <li><strong>Password Vault</strong> — stores credentials securely on the device itself (not the cloud).</li>
+              <li><strong>BLE Keyboard</strong> — wirelessly types credentials into any device.</li>
+              <li><strong>OLED Face UI</strong> — animated eye display for feedback and navigation.</li>
+              <li><strong>Web Controller</strong> — this page! Manage everything over USB.</li>
+            </ul>
+          </div>
+          <div class="qs-section">
+            <h3>⚡ System Requirements</h3>
+            <ul>
+              <li>Google Chrome or Microsoft Edge browser (Web Serial API).</li>
+              <li>OLO Bit ESP32-C3 board flashed with OLO Pass firmware.</li>
+              <li>USB-C cable for configuration; Bluetooth for auto-type.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="qs-section">
+          <h3>🔌 Step 1 — Connect via USB</h3>
+          <ol>
+            <li>Plug your OLO Pass device into your computer using a USB-C cable.</li>
+            <li>Click <strong>⚡ Connect via USB Serial</strong> above.</li>
+            <li>A browser pop-up will show available serial ports — select your device (usually labelled <em>USB Serial</em> or <em>CP210x</em>).</li>
+            <li>The device screen will show a <strong>4-digit OTP</strong>. Enter it in the Web Controller to unlock the dashboard.</li>
+          </ol>
+          <div class="qs-tip">🔑 The OTP changes every session for security. It is shown only on the physical OLED screen.</div>
+        </div>
+
+        <div class="qs-section">
+          <h3>🔑 Step 2 — Manage Your Vault</h3>
+          <ol>
+            <li>Go to the <strong>Vault Manager</strong> tab after unlocking.</li>
+            <li>Fill in the <em>Title</em>, <em>Username/Email</em>, <em>Password</em>, and optional <em>URL</em> in the form.</li>
+            <li>Click <strong>Save to Device</strong> to store the record on the hardware.</li>
+            <li>To edit or delete a record, click <strong>Edit</strong> next to any entry.</li>
+          </ol>
+        </div>
+
+        <div class="qs-section">
+          <h3>📡 Step 3 — Auto-Type with BLE</h3>
+          <ol>
+            <li>On the OLO Pass device, pair it as a Bluetooth keyboard from your phone or computer.</li>
+            <li>Navigate to a login page and focus the username field.</li>
+            <li>On the OLO Pass device, navigate to <em>Password Vault</em>, select your account.</li>
+            <li>Single-tap to type the <strong>Username</strong>, double-tap to type the <strong>Password</strong>.</li>
+          </ol>
+        </div>
+      </div>
+
+      <p style="text-align:center; color:var(--text2); font-size:0.8rem; margin-top:1.5rem;">
+        Need hardware? <a href="https://www.olobit.in" target="_blank"
+          style="color:var(--primary); font-weight:600;">Get the OLO Bit Board →</a>
+      </p>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainDashboard" style="display: none;">
+      <div class="nav-tabs">
+        <button class="tab-btn active" id="tabBtn-vault" onclick="switchTab('vault')">🔑 Vault Manager</button>
+        <button class="tab-btn" id="tabBtn-pusher" onclick="switchTab('pusher')">⌨️ Text Pusher</button>
+        <button class="tab-btn" id="tabBtn-settings" onclick="switchTab('settings')">⚙️ Settings</button>
+        <button class="tab-btn" id="tabBtn-flasher" onclick="switchTab('flasher')">⚡ Flasher</button>
+        <button class="tab-btn" onclick="btnDisconnect.click()"
+          style="color: #ff4d4d; margin-left: auto; border: 1px solid rgba(255,77,77,0.25); background: rgba(255,77,77,0.05); padding: 0.5rem 1rem; border-radius: 8px;">🔌 Disconnect</button>
+      </div>
+
+      <!-- Tab: Vault Manager -->
+      <div id="tab-vault" class="panel active">
+        <!-- Bulk CSV drag-and-drop importer -->
+        <div class="card" style="margin-bottom: 1.5rem; padding: 0.75rem 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.5rem; filter: drop-shadow(0 0 5px rgba(255, 106, 0, 0.45));">📥</span>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">Bulk Import Credentials</h4>
+                <p style="font-size: 0.75rem; color: var(--text2);">Import CSV password files exported from Chrome, Brave, Edge, etc.</p>
+              </div>
+            </div>
+            <div id="dropZone" class="import-zone" style="flex: 1; max-width: 500px; padding: 0.6rem 1rem; border: 1px dashed var(--border); border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(255, 106, 0, 0.01);">
+              <span style="font-size: 0.8rem; color: var(--text2);"><strong>Drag & Drop CSV</strong> here or <strong>click to browse</strong></span>
+              <input type="file" id="fileInput" accept=".csv" style="display: none;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div>
+            <div class="vault-actions">
+              <input type="text" id="vaultSearch" class="search-box" placeholder="Search accounts..."
+                oninput="filterVault()" />
+              <button onclick="exportToCsv()" class="btn btn-secondary">📥 Export CSV</button>
+              <button onclick="clearVaultData()" class="btn btn-danger" style="margin-left: auto;">🧨 Clear Vault</button>
+            </div>
+
+            <div id="vaultList" class="vault-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Vault Editor Card -->
+          <div class="card" style="padding: 1.5rem; margin-bottom: 0;">
+            <h3 id="editorTitle" style="margin-bottom: 1.25rem;">New Account</h3>
+            <input type="hidden" id="editId" value="" />
+
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" id="editTitle" placeholder="e.g. Google Account" />
+            </div>
+
+            <div class="form-group">
+              <label>Username / Email</label>
+              <input type="text" id="editUser" placeholder="e.g. user@gmail.com" />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.5rem;">
+              <label>Password</label>
+              <input type="text" id="editPass" placeholder="Password value" />
+              <button onclick="generateRandomPass()" class="btn btn-secondary"
+                style="width: 100%; margin-top: 0.35rem; padding: 0.4rem; font-size: 0.8rem; box-shadow: none;">Generate
+                Random Password</button>
+            </div>
+
+            <div class="form-group">
+              <label>URL</label>
+              <input type="text" id="editUrl" placeholder="e.g. accounts.google.com" />
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="checkbox" id="editFav" style="width: auto;" />
+              <label for="editFav" style="margin-bottom: 0;">Mark as Favorite</label>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <button onclick="saveRecord()" class="btn" style="width: 100%;">Save to Device</button>
+              <button onclick="clearEditor()" class="btn btn-secondary" style="width: 100%;">Clear Form</button>
+              <button id="btnDeleteRec" onclick="deleteRecord()" class="btn btn-danger"
+                style="width: 100%; display: none;">Delete</button>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- Tab: Text Pusher -->
+      <div id="tab-pusher" class="panel">
+        <div class="dashboard-grid">
+          <!-- Card 1: Text Input -->
+          <div class="card" style="margin-bottom: 0;">
+            <div class="card-title"
+              style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;">⌨️ BLE Text
+              Pusher</div>
+            <p style="color: var(--text2); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">
+              Enter any text below and click "Push to Host". The connected OLO Pass device will type this text
+              character-by-character into your active window.
+            </p>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+              <textarea id="pusherTextInput" rows="8" placeholder="Type or paste your text here..."
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.2); color: var(--text); font-family: inherit; font-size: 1rem; resize: vertical; outline: none;"></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+              <button id="btnPushText" class="btn" style="flex: 1;">⚡ Push to Host</button>
+              <button onclick="document.getElementById('pusherTextInput').value = ''" class="btn btn-secondary"
+                style="box-shadow: none;">Clear</button>
+            </div>
+          </div>
+          <!-- Card 2: Instructions -->
+          <div class="card"
+            style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-title"
+                style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;">Information &
+                Guide</div>
+              <ul
+                style="color: var(--text2); font-size: 0.9rem; line-height: 1.6; list-style-type: none; display: flex; flex-direction: column; gap: 0.75rem;">
+                <li>🔒 <strong>Direct Keyboard Injection:</strong> Text pushed from here is typed directly onto your BLE
+                  connected device as if you were typing on a physical keyboard.</li>
+                <li>📝 <strong>Multiline Support:</strong> Newlines are fully supported. Use this to push scripts, code
+                  blocks, or standard messages.</li>
+                <li>⚡ <strong>OS Layout Compatibility:</strong> Ensure your OLO Pass OS settings match the target
+                  operating system for proper typing speed.</li>
+                <li>🔋 <strong>Status Indicator:</strong> Check the device screen or the status bar above to confirm
+                  Bluetooth connection before pushing.</li>
+              </ul>
+            </div>
+            <div
+              style="border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text2); text-align: center;">
+              Connected via Web Serial
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Settings -->
+      <div id="tab-settings" class="panel">
+        <div class="dashboard-grid">
+
+          <!-- Left Column -->
+          <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Card 1: Device Security & Quick Pass -->
+            <div class="card" style="margin-bottom: 0;">
+              <div class="card-title"
+                style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 1.25rem;">Device
+                Security</div>
+
+              <div class="form-group">
+                <label>On-Device Password Vault Unlock PIN</label>
+                <input type="password" id="setPin" value="1234" maxlength="4"
+                  style="max-width: 150px; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 1.25rem;" />
+                <button id="btnSavePin" class="btn btn-secondary"
+                  style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.85rem;">Update PIN</button>
+              </div>
+
+
+              <div class="form-group"
+                style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                <label>Custom Quick Password (Auto-type shortcut)</label>
+                <input type="text" id="setQuickPass" placeholder="Configure quick password..." />
+                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+                  <button id="btnSaveQuickPass" class="btn btn-secondary"
+                    style="padding: 0.5rem 1rem; font-size: 0.85rem;">Save to Device</button>
+                  <button onclick="typeStoredQuickPass()" class="btn btn-secondary"
+                    style="padding: 0.5rem 1rem; font-size: 0.85rem; border-color: var(--primary);">Test Type via
+                    BLE</button>
+                </div>
+              </div>
+
+              <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                <button id="btnResetDevice" class="btn btn-danger" style="width: 100%;">Factory Reset Device
+                  Settings</button>
+              </div>
+            </div>
+
+            <!-- Card 4: BLE Device Settings -->
+            <div class="card" style="margin-bottom: 0;">
+              <div class="card-title"
+                style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 1.25rem;">BLE Settings</div>
+              
+              <div class="form-group">
+                <label>BLE Device Name</label>
+                <input type="text" id="setBtName" placeholder="OLO Bit" />
+              </div>
+
+              <div class="form-group">
+                <label>BLE Manufacturer Details</label>
+                <input type="text" id="setBtManu" placeholder="Micromaker Labs" />
+              </div>
+
+              <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255, 106, 0, 0.05); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; color: var(--text2); display: flex; align-items: flex-start; gap: 0.5rem;">
+                <span style="color: var(--accent);">⚠️</span>
+                <span>Changing the BLE device name automatically rotates the BLE MAC address. The device will automatically reboot to apply these changes.</span>
+              </div>
+
+              <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+                <button id="btnSaveBle" class="btn" style="width: 100%;">Save & Apply BLE Settings</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: System Profiles & Settings -->
+          <div class="card" style="margin-bottom: 0;">
+            <div class="card-title"
+              style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 1.25rem;">System
+              Settings</div>
+
+            <div class="form-group">
+              <label>Target OS Profile (BLE short delays)</label>
+              <select id="setOs">
+                <option value="0">Windows (15ms delay)</option>
+                <option value="1">macOS (15ms delay)</option>
+                <option value="2">Linux (15ms delay)</option>
+                <option value="3">Android (35ms delay)</option>
+                <option value="4">iOS (35ms delay)</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label>Deep Sleep Delay (aka Screensaver time)</label>
+                <select id="setSlDelay">
+                  <option value="60">1 Minute</option>
+                  <option value="120">2 Minutes</option>
+                  <option value="300">5 Minutes</option>
+                  <option value="600">10 Minutes</option>
+                  <option value="1200">20 Minutes</option>
+                  <option value="1800">30 Minutes</option>
+                  <option value="3600">1 Hour</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Time Format</label>
+              <select id="setTimeFmt">
+                <option value="0">12 Hour format (AM/PM)</option>
+                <option value="1">24 Hour format</option>
+              </select>
+            </div>
+
+            <div class="form-checkbox">
+              <input type="checkbox" id="setBleEn" />
+              <label for="setBleEn">Enable BLE Keyboard Broadcast on Boot</label>
+            </div>
+
+            <div class="form-checkbox">
+              <input type="checkbox" id="setSoundEn" />
+              <label for="setSoundEn">Enable Audio Buzzes / Startup Melody</label>
+            </div>
+
+            <div class="form-checkbox">
+              <input type="checkbox" id="setChimeEn" />
+              <label for="setChimeEn">Enable Hourly Buzzer Chime Alert</label>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+              <button id="btnSaveSystem" class="btn" style="width: 100%;">Save System Settings</button>
+              <button id="btnSyncTime" class="btn btn-secondary" style="width: 100%;">Sync Clock</button>
+            </div>
+          </div>
+
+          <!-- Card 3: NeoPixel RGB LED Customization -->
+          <div class="card" style="grid-column: span 2; margin-top: 1rem;">
+            <div class="card-title"
+              style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 1.25rem;">WS2812B RGB
+              NeoPixel LED Settings</div>
+
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+              <div class="form-group">
+                <label>LED Mode</label>
+                <select id="setLedMode">
+                  <option value="0">Normal (Rainbow Cycle)</option>
+                  <option value="1">Static Color</option>
+                  <option value="2">Pulse Animation</option>
+                  <option value="3">RGB Breath</option>
+                  <option value="4">Disabled / Off</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Static LED Color</label>
+                <input type="color" id="setLedColor" value="#00ff00"
+                  style="padding: 0.25rem; height: 42px; cursor: pointer;" />
+              </div>
+
+              <div class="form-group">
+                <label>Brightness (0 - 255)</label>
+                <input type="range" id="setLedBright" min="0" max="255" value="40"
+                  style="height: 42px; cursor: pointer;" />
+              </div>
+
+              <div class="form-group">
+                <label>Animation Speed (ms)</label>
+                <input type="range" id="setLedSpeed" min="100" max="3000" step="50" value="1000"
+                  style="height: 42px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+              <button id="btnSaveLed" class="btn">Apply & Save LED settings</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Firmware Flasher (Accessible both logged in and logged out) -->
+    <div id="tab-flasher" class="panel">
+      <div class="card" style="text-align: center; margin-bottom: 0;">
+        <div style="max-width: 600px; margin: 2rem auto;">
+          <div class="connect-logo" style="font-size: 3.5rem;">⚡</div>
+          <h2 style="margin-bottom: 1rem; color: var(--primary);">Flash OLO Pass Firmware</h2>
+          <p style="color: var(--text2); margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.6; text-align: left;">
+            Select your screen controller and channel configuration, then connect your OLO Bit device to flash. If the
+            device is not detected, hold the physical <strong>BOOT</strong> button while plugging in the USB-C cable.
+          </p>
+
+          <div class="form-group" style="max-width: 320px; margin: 0 auto 2rem auto; text-align: left;">
+            <label style="text-align: center; display: block;">Select Target Environment</label>
+            <select id="flashEnvSelect" onchange="updateFlasherManifest()">
+              <option value="OLO-Jiggler-Git/manifest_sh110x.json">SH110X — Mono (1.3&quot; OLED)</option>
+              <option value="OLO-Jiggler-Git/manifest_ssd1306.json">SSD1306 — Mono (0.96&quot; OLED)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; justify-content: center; min-height: 48px; gap: 1rem;">
+            <esp-web-install-button id="flasherBtn" manifest="OLO-Jiggler-Git/manifest_sh110x.json">
+              <button slot="activate" class="btn">Connect & Flash</button>
+              <span slot="unsupported">Your browser does not support Web Serial. Use Google Chrome or MS Edge.</span>
+            </esp-web-install-button>
+            <button onclick="closeFlasher()" id="flasherBackBtn" class="btn btn-secondary">Back to Login</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- OLOverse Footer -->
+  <footer>
+    <p>Part of the <span style="color: var(--primary); font-weight: 600;">OLOverse</span> ecosystem.</p>
+    <p style="margin-top: 0.5rem;">Need official hardware? <a href="https://www.olobit.in" target="_blank">Get the OLO
+        Bit Development Board</a></p>
+  </footer>
+
+  <script>
+    let connectionType = 'usb';
+    let serialPort = null;
+    let reader = null;
+    let writer = null;
+    let receivedDataBuffer = '';
+    let webPassword = 'admin'; // Loaded from device CONFIG response
+    let configReceived = false; // Gate flag — show modal only after config arrives
+
+    let vaultList = [];
+
+    // DOM Elements
+    const connectPanel = document.getElementById('connectPanel');
+    const mainDashboard = document.getElementById('mainDashboard');
+    const connDot = document.getElementById('connDot');
+    const connLabel = document.getElementById('connLabel');
+    const btnConnectUsb = document.getElementById('btnConnectUsb');
+    const btnDisconnect = document.getElementById('btnDisconnect');
+    const flasherBackBtn = document.getElementById('flasherBackBtn');
+    const pwGateModal = document.getElementById('pwGateModal');
+    const pwGateInput = document.getElementById('pwGateInput');
+    const pwGateError = document.getElementById('pwGateError');
+    const pwGateSubmit = document.getElementById('pwGateSubmit');
+
+    // Password gate logic (OTP Verification)
+    pwGateSubmit.onclick = () => {
+      const entered = pwGateInput.value.trim();
+      if (entered.length !== 4 || isNaN(entered)) {
+        pwGateError.textContent = 'OTP must be 4 digits.';
+        pwGateError.style.display = 'block';
+        return;
+      }
+      sendSerialCommand('VERIFY_WEB_OTP:' + entered);
+    };
+
+    pwGateInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') pwGateSubmit.click();
+    });
+
+    function disconnectAndClose() {
+      pwGateModal.style.display = 'none';
+      btnDisconnect.click();
+    }
+
+    btnConnectUsb.onclick = async () => {
+      try {
+        serialPort = await navigator.serial.requestPort();
+        await serialPort.open({ baudRate: 115200 });
+        connectionType = 'usb';
+
+        writer = serialPort.writable.getWriter();
+
+        // Start read loop first
+        readSerialLoop();
+
+        // Sync clock
+        sendSerialCommand('SET_EPOCH:' + Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 1000));
+
+        // Trigger web OTP generation on device
+        sendSerialCommand('GET_WEB_OTP');
+
+        // Update connection indicator
+        connDot.classList.add('connected');
+        connLabel.textContent = 'USB Serial';
+        btnDisconnect.style.display = 'inline-block';
+        flasherBackBtn.style.display = 'none';
+        configReceived = false;
+
+        // Fallback: trigger web OTP after 1.5s if not received yet
+        setTimeout(() => {
+          if (!configReceived) {
+            sendSerialCommand('GET_WEB_OTP');
+          }
+        }, 1500);
+
+      } catch (e) {
+        alert('Web Serial connection failed: ' + e.message);
+      }
+    };
+
+    btnDisconnect.onclick = async () => {
+      try {
+        await sendSerialCommand('CLOSE_SESSION');
+        await new Promise(r => setTimeout(r, 100)); // wait for command flush
+        if (reader) await reader.cancel();
+        if (writer) writer.releaseLock();
+        if (serialPort) await serialPort.close();
+      } catch (e) { console.error(e); }
+      serialPort = null; reader = null; writer = null; connectionType = null;
+      configReceived = false;
+
+      // Reset UI
+      btnDisconnect.style.display = 'none';
+      connectPanel.style.display = 'block';
+      mainDashboard.style.display = 'none';
+      connDot.classList.remove('connected');
+      connLabel.textContent = 'Disconnected';
+      flasherBackBtn.style.display = 'inline-block';
+      pwGateModal.style.display = 'none';
+    };
+
+    function showDashboard() {
+      connectPanel.style.display = 'none';
+      mainDashboard.style.display = 'block';
+      // Tab reset to vault
+      document.getElementById('tab-flasher').classList.remove('active');
+      document.getElementById('tab-vault').classList.add('active');
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('tabBtn-vault').classList.add('active');
+    }
+
+    async function readSerialLoop() {
+      reader = serialPort.readable.getReader();
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          const text = new TextDecoder().decode(value);
+          receivedDataBuffer += text;
+
+          let lineEnd = receivedDataBuffer.indexOf('\n');
+          while (lineEnd >= 0) {
+            const line = receivedDataBuffer.substring(0, lineEnd).trim();
+            receivedDataBuffer = receivedDataBuffer.substring(lineEnd + 1);
+            handleSerialLine(line);
+            lineEnd = receivedDataBuffer.indexOf('\n');
+          }
+        }
+      } catch (e) {
+        console.error('Serial read error:', e);
+      } finally {
+        reader.releaseLock();
+      }
+    }
+
+    function handleSerialLine(line) {
+      console.log('[SERIAL IN]', line);
+      if (line.startsWith('VAULT_DATA:')) {
+        try {
+          let jsonStr = line.substring(11);
+          vaultList = JSON.parse(jsonStr);
+          renderVault();
+        } catch (e) {
+          console.error('Failed to parse vault serial payload');
+        }
+      } else if (line.startsWith('CONFIG:')) {
+        // Fix: split only on FIRST '=' so values containing '=' are preserved
+        let parts = line.substring(7).split(';');
+        let cfg = {};
+        parts.forEach(p => {
+          let eqIdx = p.indexOf('=');
+          if (eqIdx > 0) {
+            cfg[p.substring(0, eqIdx)] = p.substring(eqIdx + 1);
+          }
+        });
+        if (cfg.target_os !== undefined) document.getElementById('setOs').value = cfg.target_os;
+        if (cfg.bt_name !== undefined) document.getElementById('setBtName').value = cfg.bt_name;
+        if (cfg.bt_manu !== undefined) document.getElementById('setBtManu').value = cfg.bt_manu;
+        if (cfg.payload !== undefined) document.getElementById('setQuickPass').value = cfg.payload;
+        // Fix: Removed ss_delay parsing since it's merged with sl_delay
+        if (cfg.sl_delay !== undefined) {
+          const slDel = parseInt(cfg.sl_delay);
+          const slEl = document.getElementById('setSlDelay');
+          slEl.value = slDel;
+          if (!slEl.value || parseInt(slEl.value) !== slDel) {
+            let closest = null;
+            Array.from(slEl.options).forEach(o => {
+              if (closest === null || Math.abs(parseInt(o.value) - slDel) < Math.abs(parseInt(closest.value) - slDel)) closest = o;
+            });
+            if (closest) slEl.value = closest.value;
+          }
+        }
+        if (cfg.sound_en !== undefined) document.getElementById('setSoundEn').checked = (cfg.sound_en == 1);
+        if (cfg.chime_en !== undefined) document.getElementById('setChimeEn').checked = (cfg.chime_en == 1);
+        if (cfg.ble_en !== undefined) document.getElementById('setBleEn').checked = (cfg.ble_en == 1);
+        if (cfg.time_fmt !== undefined) document.getElementById('setTimeFmt').value = cfg.time_fmt;
+        if (cfg.vault_pin !== undefined) document.getElementById('setPin').value = cfg.vault_pin;
+
+        if (cfg.led_mode !== undefined) document.getElementById('setLedMode').value = cfg.led_mode;
+        if (cfg.led_bright !== undefined) document.getElementById('setLedBright').value = cfg.led_bright;
+        if (cfg.led_speed !== undefined) document.getElementById('setLedSpeed').value = cfg.led_speed;
+
+        // Parse RGB color to HEX
+        if (cfg.led_r !== undefined && cfg.led_g !== undefined && cfg.led_b !== undefined) {
+          let r = parseInt(cfg.led_r).toString(16).padStart(2, '0');
+          let g = parseInt(cfg.led_g).toString(16).padStart(2, '0');
+          let b = parseInt(cfg.led_b).toString(16).padStart(2, '0');
+          document.getElementById('setLedColor').value = `#${r}${g}${b}`;
+        }
+
+      } else if (line.startsWith('OK:WEB_OTP_VERIFIED')) {
+        pwGateModal.style.display = 'none';
+        pwGateInput.value = '';
+        pwGateError.style.display = 'none';
+
+        // Fetch config NVS settings
+        sendSerialCommand('GET_CONFIG');
+        // Load passwords via serial
+        sendSerialCommand('GET_VAULT');
+
+        showDashboard();
+      } else if (line.startsWith('ERR:WEB_OTP_INVALID')) {
+        pwGateError.textContent = 'Incorrect OTP. Try again.';
+        pwGateError.style.display = 'block';
+        pwGateInput.select();
+      } else if (line.startsWith('WEB_OTP_REQUIRED')) {
+        configReceived = true; // stop fallback timer
+        pwGateInput.value = '';
+        pwGateError.style.display = 'none';
+        pwGateModal.style.display = 'flex';
+        setTimeout(() => pwGateInput.focus(), 100);
+      } else if (line.startsWith('OTP_REQUIRED')) {
+        document.getElementById('otpInput').value = '';
+        document.getElementById('otpError').style.display = 'none';
+        document.getElementById('otpModal').style.display = 'flex';
+        setTimeout(() => document.getElementById('otpInput').focus(), 100);
+      } else if (line.startsWith('OK:Unlock PIN updated')) {
+        document.getElementById('otpModal').style.display = 'none';
+        alert('Security PIN updated!');
+      } else if (line.startsWith('ERR:Invalid OTP')) {
+        document.getElementById('otpError').style.display = 'block';
+        document.getElementById('otpInput').select();
+      } else if (line.startsWith('ERR:PIN change cancelled')) {
+        document.getElementById('otpModal').style.display = 'none';
+        alert('PIN change cancelled: ' + line.substring(25));
+      }
+    }
+
+    async function sendSerialCommand(cmd) {
+      if (!writer) return;
+      const bytes = new TextEncoder().encode(cmd + '\n');
+      await writer.write(bytes);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+
+      const tabEl = document.getElementById('tab-' + tabId);
+      if (tabEl) {
+        tabEl.classList.add('active');
+      }
+
+      const tabBtn = document.getElementById('tabBtn-' + tabId);
+      if (tabBtn) {
+        tabBtn.classList.add('active');
+      }
+
+      if (tabId === 'flasher') {
+        connectPanel.style.display = 'none';
+      }
+    }
+
+    function closeFlasher() {
+      document.getElementById('tab-flasher').classList.remove('active');
+      connectPanel.style.display = 'block';
+    }
+
+    function updateFlasherManifest() {
+      const select = document.getElementById('flashEnvSelect');
+      const btn = document.getElementById('flasherBtn');
+      btn.setAttribute('manifest', select.value);
+    }
+
+    // API Call helper mapped to Serial commands
+    async function apiCall(endpoint, method = 'GET', data = null) {
+      if (endpoint === '/api/passwords' && method === 'GET') {
+        sendSerialCommand('GET_VAULT');
+      } else if (endpoint === '/api/passwords/save' && method === 'POST') {
+        sendSerialCommand('SAVE_REC:' + JSON.stringify(data));
+      } else if (endpoint === '/api/passwords/delete' && method === 'POST') {
+        sendSerialCommand('DEL_REC:' + data.id);
+      } else if (endpoint === '/api/config' && method === 'POST') {
+        if (data.vault_pin !== undefined) {
+          sendSerialCommand('SET_PIN:' + data.vault_pin);
+        }
+        if (data.custom_payload !== undefined) {
+          sendSerialCommand('SET_PAYLOAD:' + data.custom_payload);
+        }
+        if (data.bt_name !== undefined) {
+          sendSerialCommand('SET_BT_NAME:' + data.bt_name);
+        }
+        if (data.bt_manu !== undefined) {
+          sendSerialCommand('SET_BT_MANU:' + data.bt_manu);
+        }
+        if (data.target_os !== undefined) {
+          sendSerialCommand('SET_OS:' + data.target_os);
+        }
+        if (data.ss_delay !== undefined) {
+          sendSerialCommand('SET_SS_DELAY:' + data.ss_delay);
+        }
+        if (data.sl_delay !== undefined) {
+          sendSerialCommand('SET_SL_DELAY:' + data.sl_delay);
+        }
+        if (data.sound_en !== undefined) {
+          sendSerialCommand('SET_SOUND:' + (data.sound_en ? 1 : 0));
+        }
+        if (data.chime_en !== undefined) {
+          sendSerialCommand('SET_CHIME:' + (data.chime_en ? 1 : 0));
+        }
+        if (data.ble_en !== undefined) {
+          sendSerialCommand('SET_BLE:' + (data.ble_en ? 1 : 0));
+        }
+        if (data.time_fmt !== undefined) {
+          sendSerialCommand('SET_TIME_FMT:' + data.time_fmt);
+        }
+        sendSerialCommand('SAVE_CONF');
+      } else if (endpoint === '/api/sync_time' && method === 'POST') {
+        sendSerialCommand('SET_EPOCH:' + data.epoch);
+      }
+      return null;
+    }
+
+    function renderVault() {
+      const container = document.getElementById('vaultList');
+      container.innerHTML = '';
+
+      if (vaultList.length === 0) {
+        container.innerHTML = `<div style="text-align: center; padding: 3rem; color: var(--text2);">No passwords saved yet. Add an account on the right or upload a CSV file above.</div>`;
+        return;
+      }
+
+      vaultList.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'vault-item';
+        // Escape values to prevent XSS when building onclick
+        const safePass = encodeURIComponent(item.pass);
+        div.innerHTML = `
+          <div class="vault-info">
+            <h3>${item.title}</h3>
+            <p>${item.user} &bull; ${item.url || 'No URL'}</p>
+          </div>
+          <div class="vault-meta">
+            <span class="fav-star ${item.favorite ? 'active' : ''}" onclick="toggleFavorite(${item.id}, ${item.favorite})">★</span>
+            <button class="btn btn-secondary" title="Copy password" onclick="copyPassword('${safePass}')" style="padding: 0.3rem 0.5rem; font-size: 0.75rem; line-height: 1;">📋</button>
+            <button class="btn btn-secondary" onclick="openEditor(${item.id})" style="padding: 0.3rem 0.5rem; font-size: 0.75rem; line-height: 1;">Edit</button>
+          </div>
+        `;
+        container.innerHTML += div.outerHTML;
+      });
+    }
+
+    // Improvement G: Copy password to clipboard
+    function copyPassword(encodedPass) {
+      const pass = decodeURIComponent(encodedPass);
+      navigator.clipboard.writeText(pass)
+        .then(() => showToast('✅ Password copied!', 'success'))
+        .catch(() => showToast('❌ Clipboard unavailable', 'error'));
+    }
+
+    // Bug #8: Toast notification system for save/delete feedback
+    function showToast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.style.cssText = [
+        'background:' + (type === 'success' ? 'rgba(0,200,100,0.15)' : 'rgba(255,60,60,0.15)'),
+        'border:1px solid ' + (type === 'success' ? 'rgba(0,200,100,0.5)' : 'rgba(255,60,60,0.5)'),
+        'color:#fff',
+        'padding:0.65rem 1.25rem',
+        'border-radius:10px',
+        'font-size:0.875rem',
+        'backdrop-filter:blur(8px)',
+        'animation:fadeIn 0.2s ease',
+        'box-shadow:0 4px 20px rgba(0,0,0,0.4)'
+      ].join(';');
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 350); }, 2200);
+    }
+
+    function filterVault() {
+      const q = document.getElementById('vaultSearch').value.toLowerCase();
+      const items = document.querySelectorAll('.vault-item');
+      items.forEach(el => {
+        const txt = el.innerText.toLowerCase();
+        el.style.display = txt.indexOf(q) >= 0 ? 'flex' : 'none';
+      });
+    }
+
+    function openEditor(id = null) {
+      if (id === null) {
+        document.getElementById('editorTitle').textContent = 'New Account';
+        document.getElementById('editId').value = '';
+        document.getElementById('editTitle').value = '';
+        document.getElementById('editUser').value = '';
+        document.getElementById('editPass').value = '';
+        document.getElementById('editUrl').value = '';
+        document.getElementById('editFav').checked = false;
+        document.getElementById('btnDeleteRec').style.display = 'none';
+      } else {
+        const item = vaultList.find(x => x.id === id);
+        if (!item) return;
+        document.getElementById('editorTitle').textContent = 'Edit Account';
+        document.getElementById('editId').value = item.id;
+        document.getElementById('editTitle').value = item.title;
+        document.getElementById('editUser').value = item.user;
+        document.getElementById('editPass').value = item.pass;
+        document.getElementById('editUrl').value = item.url || '';
+        document.getElementById('editFav').checked = !!item.favorite;
+        document.getElementById('btnDeleteRec').style.display = 'block';
+      }
+    }
+
+    function clearEditor() {
+      openEditor();
+    }
+
+    function exportToCsv() {
+      if (!vaultList || vaultList.length === 0) {
+        showToast('⚠️ Vault is empty. Nothing to export.', 'error');
+        return;
+      }
+      const escapeCsv = (str) => {
+        if (!str) return '';
+        str = String(str);
+        if (str.includes(',') || str.includes('\n') || str.includes('"')) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+      let csvContent = 'name,url,username,password\n';
+      vaultList.forEach(r => {
+        csvContent += `${escapeCsv(r.title)},${escapeCsv(r.url)},${escapeCsv(r.user)},${escapeCsv(r.pass)}\n`;
+      });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "olopass_passwords.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function clearVaultData() {
+      const pin = prompt("Are you sure you want to completely erase the Password Vault?\n\nEnter your 4-digit Vault PIN to confirm:");
+      if (pin !== null) {
+        if (pin.length !== 4) {
+          alert("Invalid PIN. It must be 4 digits.");
+          return;
+        }
+        sendSerialCommand('CLEAR_VAULT:' + pin);
+        setTimeout(() => {
+          sendSerialCommand('GET_VAULT_DATA');
+        }, 500);
+      }
+    }
+
+    async function saveRecord() {
+      const title = document.getElementById('editTitle').value.trim();
+      const user = document.getElementById('editUser').value.trim();
+      const pass = document.getElementById('editPass').value.trim();
+      const url = document.getElementById('editUrl').value.trim();
+      const fav = document.getElementById('editFav').checked ? 1 : 0;
+      const idVal = document.getElementById('editId').value;
+      const id = idVal ? parseInt(idVal) : 0;
+
+      if (!title || !pass) {
+        alert('Title and Password are required.');
+        return;
+      }
+
+      // Bug #8: show saving feedback
+      showToast('💾 Saving record...', 'success');
+      const rec = { id, title, user, pass, url, favorite: fav };
+      await apiCall('/api/passwords/save', 'POST', rec);
+      clearEditor();
+      showToast('✅ Record saved to device!', 'success');
+    }
+
+    async function deleteRecord() {
+      const idVal = document.getElementById('editId').value;
+      if (!idVal) return;
+      if (confirm('Delete this account from OLO Pass permanently?')) {
+        showToast('🗑️ Deleting record...', 'error');
+        await apiCall('/api/passwords/delete', 'POST', { id: parseInt(idVal) });
+        clearEditor();
+        showToast('✅ Record deleted.', 'success');
+      }
+    }
+
+    async function toggleFavorite(id, current) {
+      const item = vaultList.find(x => x.id === id);
+      if (!item) return;
+      item.favorite = current ? 0 : 1;
+      await apiCall('/api/passwords/save', 'POST', item);
+    }
+
+    // Drag-and-drop CSV handler
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.onclick = () => fileInput.click();
+
+    dropZone.ondragover = (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = 'var(--primary)';
+    };
+
+    dropZone.ondragleave = () => {
+      dropZone.style.borderColor = 'var(--border)';
+    };
+
+    dropZone.ondrop = (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = 'var(--border)';
+      if (e.dataTransfer.files.length > 0) {
+        handleCsvFile(e.dataTransfer.files[0]);
+      }
+    };
+
+    fileInput.onchange = (e) => {
+      if (e.target.files.length > 0) {
+        handleCsvFile(e.target.files[0]);
+      }
+    };
+
+    function parseCsvLine(text) {
+      let r = [];
+      let insideQuote = false;
+      let entry = '';
+      for (let i = 0; i < text.length; i++) {
+        let c = text[i];
+        let next = text[i+1];
+        if (c === '"') {
+          if (insideQuote && next === '"') {
+            entry += '"';
+            i++;
+          } else {
+            insideQuote = !insideQuote;
+          }
+        } else if (c === ',' && !insideQuote) {
+          r.push(entry.trim());
+          entry = '';
+        } else {
+          entry += c;
+        }
+      }
+      r.push(entry.trim());
+      return r;
+    }
+
+    function handleCsvFile(file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target.result;
+        // Parse CSV line by line, handling CRLF/LF line endings
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length === 0) {
+          alert('CSV file is empty.');
+          return;
+        }
+
+        // Parse header row to dynamically locate column indices
+        const headers = parseCsvLine(lines[0]);
+        let nameIdx = -1;
+        let urlIdx = -1;
+        let userIdx = -1;
+        let passIdx = -1;
+
+        for (let i = 0; i < headers.length; i++) {
+          const h = headers[i].toLowerCase();
+          if (h === 'name' || h === 'title') nameIdx = i;
+          else if (h === 'url' || h === 'link' || h === 'website') urlIdx = i;
+          else if (h === 'username' || h === 'user' || h === 'login' || h === 'email') userIdx = i;
+          else if (h === 'password' || h === 'pass') passIdx = i;
+        }
+
+        // Fallbacks if header doesn't match standard terms
+        if (nameIdx === -1) nameIdx = 0;
+        if (urlIdx === -1) urlIdx = 1;
+        if (userIdx === -1) userIdx = 2;
+        if (passIdx === -1) passIdx = 3;
+
+        let imported = 0;
+        let skipped = 0;
+        
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCsvLine(lines[i]);
+          if (cols.length <= Math.max(nameIdx, urlIdx, userIdx, passIdx)) {
+            skipped++;
+            continue;
+          }
+          const title = cols[nameIdx] || 'Imported';
+          const url = cols[urlIdx] || '';
+          const user = cols[userIdx] || '';
+          const pass = cols[passIdx] || '';
+          
+          if (!pass) {
+            skipped++;
+            continue;
+          }
+          
+          const rec = { id: 0, title, user, pass, url, favorite: 0 };
+          sendSerialCommand('SAVE_REC:' + JSON.stringify(rec));
+          imported++;
+          await new Promise(r => setTimeout(r, 80)); // brief gap between records
+        }
+        alert(`CSV Import complete: ${imported} records sent, ${skipped} rows skipped.`);
+      };
+      reader.readAsText(file);
+    }
+
+
+
+    // Password generator
+    function generateRandomPass() {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+      let pass = "";
+      for (let i = 0; i < 16; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById('editPass').value = pass;
+    }
+
+    // Quick password type
+    async function typeStoredQuickPass() {
+      sendSerialCommand('RUN_STORED_PAYLOAD');
+    }
+
+    // Settings actions
+    document.getElementById('btnSavePin').onclick = async () => {
+      let pin = document.getElementById('setPin').value;
+      if (pin.length !== 4 || isNaN(pin)) {
+        alert('PIN must be 4 digits.');
+        return;
+      }
+      sendSerialCommand('REQ_PIN_CHANGE:' + pin);
+    };
+
+    // Text Pusher action
+    document.getElementById('btnPushText').onclick = async () => {
+      let textInput = document.getElementById('pusherTextInput');
+      let text = textInput.value;
+      if (!text) {
+        alert('Please enter some text to push.');
+        return;
+      }
+      // Escape newlines to preserve serial command structure
+      let escapedText = text.replace(/\n/g, '\\n').replace(/\r/g, '');
+      sendSerialCommand('PUSH_TEXT:' + escapedText);
+    };
+
+    const otpInput = document.getElementById('otpInput');
+    const btnVerifyOtp = document.getElementById('btnVerifyOtp');
+    btnVerifyOtp.onclick = () => {
+      let otp = otpInput.value.trim();
+      if (otp.length !== 4 || isNaN(otp)) {
+        alert('OTP must be 4 digits.');
+        return;
+      }
+      sendSerialCommand('VERIFY_OTP:' + otp);
+    };
+    otpInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnVerifyOtp.click();
+    });
+
+    document.getElementById('btnCancelOtp').onclick = () => {
+      sendSerialCommand('CANCEL_PIN_CHANGE');
+      document.getElementById('otpModal').style.display = 'none';
+    };
+
+    document.getElementById('btnSaveQuickPass').onclick = async () => {
+      let pass = document.getElementById('setQuickPass').value.trim();
+      await apiCall('/api/config', 'POST', { custom_payload: pass });
+      alert('Stored Quick Password saved to device!');
+    };
+
+    document.getElementById('btnSaveSystem').onclick = async () => {
+      let target_os = document.getElementById('setOs').value;
+      let ss_delay = document.getElementById('setSsDelay').value;
+      let sl_delay = document.getElementById('setSlDelay').value;
+      let time_fmt = document.getElementById('setTimeFmt').value;
+      let ble_en = document.getElementById('setBleEn').checked;
+      let sound_en = document.getElementById('setSoundEn').checked;
+      let chime_en = document.getElementById('setChimeEn').checked;
+
+      let payload = {
+        ss_delay: parseInt(ss_delay),
+        sl_delay: parseInt(sl_delay),
+        time_fmt: parseInt(time_fmt),
+        ble_en: ble_en,
+        sound_en: sound_en,
+        chime_en: chime_en,
+        target_os: parseInt(target_os)
+      };
+
+      await apiCall('/api/config', 'POST', payload);
+      alert('System Settings saved!');
+    };
+
+    document.getElementById('btnSaveBle').onclick = async () => {
+      let bt_name = document.getElementById('setBtName').value.trim();
+      let bt_manu = document.getElementById('setBtManu').value.trim();
+
+      if (!bt_name) {
+        alert('BLE Device Name cannot be empty.');
+        return;
+      }
+      if (!bt_manu) {
+        alert('BLE Manufacturer cannot be empty.');
+        return;
+      }
+
+      await apiCall('/api/config', 'POST', {
+        bt_name: bt_name,
+        bt_manu: bt_manu
+      });
+      alert('BLE Settings saved! The device will reboot to apply changes and rotate the MAC address.');
+      sendSerialCommand('REBOOT');
+    };
+
+    document.getElementById('btnSaveLed').onclick = async () => {
+      let mode = document.getElementById('setLedMode').value;
+      let color = document.getElementById('setLedColor').value; // #rrggbb
+      let bright = document.getElementById('setLedBright').value;
+      let speed = document.getElementById('setLedSpeed').value;
+
+      // Parse color
+      let r = parseInt(color.substring(1, 3), 16);
+      let g = parseInt(color.substring(3, 5), 16);
+      let b = parseInt(color.substring(5, 7), 16);
+
+      sendSerialCommand('SET_LED_MODE:' + mode);
+      sendSerialCommand('SET_LED_COLOR:' + r + ',' + g + ',' + b);
+      sendSerialCommand('SET_LED_BRIGHT:' + bright);
+      sendSerialCommand('SET_LED_SPEED:' + speed);
+      sendSerialCommand('SAVE_CONF');
+      alert('LED settings applied and saved!');
+    };
+
+    document.getElementById('btnResetDevice').onclick = async () => {
+      let pin = prompt("Enter vault PIN to confirm factory reset:");
+      if (pin === null) return;
+      if (pin.length !== 4 || isNaN(pin)) {
+        alert("PIN must be 4 digits.");
+        return;
+      }
+      sendSerialCommand('RESET_CONF:' + pin);
+      alert('Reset command sent. If PIN matches, the device will reboot.');
+      btnDisconnect.click();
+    };
+
+    document.getElementById('btnSyncTime').onclick = async () => {
+      let epoch = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 1000);
+      await apiCall('/api/sync_time', 'POST', { epoch });
+      showToast('🕐 Clock synchronized!', 'success');
+    };
+
+    // ── Theme Toggle ──────────────────────────────────────────────────────────
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const htmlEl = document.documentElement;
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        htmlEl.setAttribute('data-theme', 'light');
+        themeToggleBtn.textContent = '☀️';
+        themeToggleBtn.title = 'Switch to Dark Mode';
+      } else {
+        htmlEl.removeAttribute('data-theme');
+        themeToggleBtn.textContent = '🌙';
+        themeToggleBtn.title = 'Switch to Light Mode';
+      }
+      localStorage.setItem('olopass-theme', theme);
+    }
+
+    // Load persisted theme preference
+    const savedTheme = localStorage.getItem('olopass-theme') || 'dark';
+    applyTheme(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = htmlEl.getAttribute('data-theme');
+      applyTheme(current === 'light' ? 'dark' : 'light');
+    });
+  </script>
+</body>
+
+</html>
