@@ -1,6 +1,11 @@
-# OLO Pass — User Manual
+# OLO Pass — Readme
 
 Welcome to your **OLO Pass**! This hardware password vault and automated keyboard companion helps you store credentials securely and type them instantly over Bluetooth without installing any software on your computer.
+
+### 🔑 Default Credentials
+For first-time setups, use the following default credentials to configure your device:
+*   **On-Device Password Vault PIN:** `1234`
+*   **Web Controller Default Password:** `admin`
 
 ---
 
