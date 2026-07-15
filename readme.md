@@ -1,6 +1,7 @@
 # OLO Pass — Readme
 
 Welcome to your **OLO Pass**! This hardware password vault and automated keyboard companion helps you store credentials securely and type them instantly over Bluetooth without installing any software on your computer.
+Web Controller Link : https://micromakerlabsfiles-git.github.io/OLO-Pass/
 
 ### 🔑 Default Credentials
 For first-time setups, use the following default PIN code to access your vault:
