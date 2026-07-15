@@ -1248,13 +1248,13 @@
           <div class="form-group" style="max-width: 320px; margin: 0 auto 2rem auto; text-align: left;">
             <label style="text-align: center; display: block;">Select Target Environment</label>
             <select id="flashEnvSelect" onchange="updateFlasherManifest()">
-              <option value="OLO-Jiggler-Git/manifest_sh110x.json">SH110X — Mono (1.3&quot; OLED)</option>
-              <option value="OLO-Jiggler-Git/manifest_ssd1306.json">SSD1306 — Mono (0.96&quot; OLED)</option>
+              <option value="manifest_sh110x.json">SH110X — Mono (1.3&quot; OLED)</option>
+              <option value="manifest_ssd1306.json">SSD1306 — Mono (0.96&quot; OLED)</option>
             </select>
           </div>
 
           <div style="display: flex; justify-content: center; min-height: 48px; gap: 1rem;">
-            <esp-web-install-button id="flasherBtn" manifest="OLO-Jiggler-Git/manifest_sh110x.json">
+            <esp-web-install-button id="flasherBtn" manifest="manifest_sh110x.json">
               <button slot="activate" class="btn">Connect & Flash</button>
               <span slot="unsupported">Your browser does not support Web Serial. Use Google Chrome or MS Edge.</span>
             </esp-web-install-button>
